@@ -63,6 +63,7 @@ public class RpcClient extends SimpleChannelInboundHandler<Response> {
             ChannelFuture f = b.connect(host, port).sync();
 //            for (int i=0; i<10;i++){         // 测试是否支持粘包
 //                f.channel().writeAndFlush(request);
+//                Thread.sleep(1000);
 //            }
             f.channel().writeAndFlush(request).sync();
             logger.info("写入成功");
@@ -81,7 +82,6 @@ public class RpcClient extends SimpleChannelInboundHandler<Response> {
         request.setClassName("Hello");
         request.setMethodName("fun");
         request.setRequestId("12343");
-
         Response response = (rpcClient.send(request));
         return;
     }

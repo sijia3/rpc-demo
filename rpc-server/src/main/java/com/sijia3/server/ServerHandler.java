@@ -40,20 +40,20 @@ public class ServerHandler extends SimpleChannelInboundHandler<Request> {
         if(StringUtil.isNotEmpty(version)){
             className = className + "-"+version;
         }
-        Object object = "lalalal";
-//        Object serviceBean = handleMap.get(className);
-//        if (serviceBean == null){
-//            throw new RuntimeException("servicebean not find");
-//        }
+//        Object object = "lalalal";
+        Object serviceBean = handleMap.get(className);
+        if (serviceBean == null){
+            throw new RuntimeException("servicebean not find");
+        }
         // 通过反射获取对象
-//        Class<?> serviceClass = serviceBean.getClass();
-//        String methodName = request.getMethodName();
-//        Class<?>[] parameterTypes = request.getPrameterTypes();
-//        Object[] parameters = request.getParameters();
-//        // 执行方法
-//        FastClass fastClass =FastClass.create(serviceClass);
-//        FastMethod fastMethod = fastClass.getMethod(methodName, parameterTypes);
-//        Object object = fastMethod.invoke(serviceBean, parameters);
+        Class<?> serviceClass = serviceBean.getClass();
+        String methodName = request.getMethodName();
+        Class<?>[] parameterTypes = request.getPrameterTypes();
+        Object[] parameters = request.getParameters();
+        // 执行方法
+        FastClass fastClass =FastClass.create(serviceClass);
+        FastMethod fastMethod = fastClass.getMethod(methodName, parameterTypes);
+        Object object = fastMethod.invoke(serviceBean, parameters);
 
         // 构造repsonse
         Response response = new Response();
@@ -71,8 +71,8 @@ public class ServerHandler extends SimpleChannelInboundHandler<Request> {
     }
 
     public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        // cglib 动态代理测试
         Class<?> serviceClass = HelloServiceImp.class;
-        // 执行方法
         FastClass fastClass =FastClass.create(serviceClass);
         FastMethod fastMethod = fastClass.getMethod("hello", new Class[]{String.class});
         HelloServiceImp helloServiceImp = (HelloServiceImp) serviceClass.newInstance();
