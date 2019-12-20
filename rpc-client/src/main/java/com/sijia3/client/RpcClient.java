@@ -81,6 +81,7 @@ public class RpcClient extends SimpleChannelInboundHandler<Response> {
         request.setClassName("Hello");
         request.setMethodName("fun");
         request.setRequestId("12343");
+
         Response response = (rpcClient.send(request));
         return;
     }
