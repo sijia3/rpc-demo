@@ -1,92 +1,79 @@
-//package com.sijia3.client;
-//
-//import com.sijia3.base.Request;
-//import com.sijia3.base.Response;
-//import com.sijia3.registry.ServerDiscovery;
-//import com.sijia3.utils.StringUtil;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-//
-//import java.lang.reflect.InvocationHandler;
-//import java.lang.reflect.Method;
-//import java.lang.reflect.Proxy;
-//import java.util.UUID;
-//
-///**
-// * RPC 代理（用于创建 RPC 服务代理）
-// *
-// * @author huangyong
-// * @since 1.0.0
-// */
-//public class RpcProxy {
-//
-//    private static final Logger LOGGER = LoggerFactory.getLogger(RpcProxy.class);
-//
-//    private String serviceAddress;
-//
-//    private ServerDiscovery serviceDiscovery;
-//
-//    public RpcProxy(String serviceAddress) {
-//        this.serviceAddress = serviceAddress;
-//    }
-//
-//    public RpcProxy(ServerDiscovery serviceDiscovery) {
-//        this.serviceDiscovery = serviceDiscovery;
-//    }
-//
-//    @SuppressWarnings("unchecked")
-//    public <T> T create(final Class<?> interfaceClass) {
-//        return create(interfaceClass, "");
-//    }
-//
-//    @SuppressWarnings("unchecked")
-//    public <T> T create(final Class<?> interfaceClass, final String serviceVersion) {
-//        // 创建动态代理对象
-//        return (T) Proxy.newProxyInstance(
-//                interfaceClass.getClassLoader(),
-//                new Class<?>[]{interfaceClass},
-//                new InvocationHandler() {
-//                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-//                        // 创建 RPC 请求对象并设置请求属性
-//                        Request request = new Request();
-//                        request.setRequestId(UUID.randomUUID().toString());
-//                        request.setClassName(method.getDeclaringClass().getName());
-//                        request.setVersion(serviceVersion);
-//                        request.setMethodName(method.getName());
-//                        request.setPrameterTypes(method.getParameterTypes());
-//                        request.setParameters(args);
-//                        // 获取 RPC 服务地址
-//                        if (serviceDiscovery != null) {
-//                            String serviceName = interfaceClass.getName();
-//                            if (StringUtil.isNotEmpty(serviceVersion)) {
-//                                serviceName += "-" + serviceVersion;
-//                            }
-//                            serviceAddress = serviceDiscovery.findServerByName(serviceName);
-//                            LOGGER.debug("discover service: {} => {}", serviceName, serviceAddress);
-//                        }
-//                        if (StringUtil.isEmpty(serviceAddress)) {
-//                            throw new RuntimeException("server address is empty");
-//                        }
-//                        // 从 RPC 服务地址中解析主机名与端口号
-//                        String[] array = StringUtil.split(serviceAddress, ":");
-//                        String host = array[0];
-//                        int port = Integer.parseInt(array[1]);
-//                        // 创建 RPC 客户端对象并发送 RPC 请求
-//                        RpcClient client = new RpcClient(host, port);
-//                        long time = System.currentTimeMillis();
-//                        Response response = client.send(request);
-//                        LOGGER.debug("time: {}ms", System.currentTimeMillis() - time);
-//                        if (response == null) {
-//                            throw new RuntimeException("response is null");
-//                        }
-//                        // 返回 RPC 响应结果
-//                        if (response.hasException()) {
-//                            throw response.getException();
-//                        } else {
-//                            return response.getResult();
-//                        }
-//                    }
-//                }
-//        );
-//    }
-//}
+package com.sijia3.client;
+
+import com.sijia3.api.HelloService;
+import com.sijia3.base.Request;
+import com.sijia3.base.Response;
+import com.sijia3.registry.ServerDiscovery;
+import com.sijia3.utils.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Date;
+import java.util.UUID;
+
+/**
+ * sijia3
+ */
+public class RpcProxy {
+    private static Logger logger = LoggerFactory.getLogger(RpcProxy.class);
+
+    private ServerDiscovery serverDiscovery;
+    private String serverAddress;
+
+    public RpcProxy(ServerDiscovery serverDiscovery){
+        this.serverDiscovery = serverDiscovery;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T create(final Class<?> clazz){
+        return create(clazz, "");
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T create(final Class<?> clazz, final String version){
+        return (T)Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[]{clazz} , new InvocationHandler() {
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                Request request = new Request();
+                request.setRequestId(UUID.randomUUID().toString());
+                request.setClassName(method.getDeclaringClass().getName());
+                request.setVersion(version);
+                request.setMethodName(method.getName());
+                request.setParameters(args);
+                request.setPrameterTypes(method.getParameterTypes());
+
+                // 获取服务
+                String serverName = "";
+                if (serverDiscovery != null) {
+                    serverName = clazz.getName();
+                    if (StringUtil.isNotEmpty(version)) {
+                        serverName = serverName + "-" + version;
+                    }
+                    serverAddress = serverDiscovery.findServerByName(serverName);
+                }
+                if (StringUtil.isEmpty(serverAddress)){
+                    logger.error("{}--找不到地址",serverName);
+                }
+
+                String[] ipAndPort = StringUtil.split(serverAddress, ":");
+                String ip = ipAndPort[0];
+                Integer port = Integer.valueOf(ipAndPort[1]);
+                RpcClient rpcClient = new RpcClient(ip, port);
+                long time = new Date().getTime();
+                Response response = rpcClient.send(request);
+                logger.info("此次调用花费：{}ms",System.currentTimeMillis()-time);
+                if (response == null){
+                    logger.error("返回为空");
+                }
+                if (response.hasException()){
+                    logger.error("返回中带有异常");
+                    throw new RuntimeException("返回有异常");
+                }else{
+                    return response.getResult();
+                }
+            }
+        });
+    }
+}

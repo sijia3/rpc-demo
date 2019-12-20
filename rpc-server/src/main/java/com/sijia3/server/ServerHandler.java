@@ -70,7 +70,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Request> {
         ctx.close();
     }
 
-    public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+    public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException, ClassNotFoundException {
         // cglib 动态代理测试
         Class<?> serviceClass = HelloServiceImp.class;
         FastClass fastClass =FastClass.create(serviceClass);

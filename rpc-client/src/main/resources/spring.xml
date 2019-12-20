@@ -13,8 +13,8 @@
         <constructor-arg name="address" value="${rpc.registry_address}"/>
     </bean>
 
-<!--    <bean id="rpcProxy" class="com.sijia3.client.RpcProxy">-->
-<!--        <constructor-arg name="serviceDiscovery" ref="serviceDiscovery"/>-->
-<!--    </bean>-->
+    <bean id="rpcProxy" class="com.sijia3.client.RpcProxy">
+        <constructor-arg name="serverDiscovery" ref="serviceDiscovery"/>
+    </bean>
 
 </beans>
