@@ -1,6 +1,10 @@
 package com.sijia3.server;
 
+import com.sijia3.base.Request;
+import com.sijia3.base.Response;
 import com.sijia3.code.MarshallingCodeCFactory;
+import com.sijia3.code.RpcDecoder;
+import com.sijia3.code.RpcEncoder;
 import com.sijia3.registry.ServerRegistry;
 import com.sijia3.utils.StringUtil;
 import io.netty.bootstrap.ServerBootstrap;
@@ -82,10 +86,10 @@ public class RpcServer implements ApplicationContextAware,InitializingBean {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-//                            ch.pipeline().addLast(new RpcDecoder(Request.class));
-//                            ch.pipeline().addLast(new RpcEncoder(Response.class));
-                            ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingDecoder());
-                            ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingEncoder());
+                            ch.pipeline().addLast(new RpcDecoder(Request.class));
+                            ch.pipeline().addLast(new RpcEncoder(Response.class));
+//                            ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingDecoder());
+//                            ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingEncoder());
                             ch.pipeline().addLast(new ServerHandler(hashMap));
                         }
                     }).option(ChannelOption.SO_BACKLOG, 1024)

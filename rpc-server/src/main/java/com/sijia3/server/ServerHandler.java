@@ -13,8 +13,10 @@ import net.sf.cglib.reflect.FastMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -71,12 +73,34 @@ public class ServerHandler extends SimpleChannelInboundHandler<Request> {
     }
 
     public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException, ClassNotFoundException {
-        // cglib 动态代理测试
         Class<?> serviceClass = HelloServiceImp.class;
-        FastClass fastClass =FastClass.create(serviceClass);
-        FastMethod fastMethod = fastClass.getMethod("hello", new Class[]{String.class});
-        HelloServiceImp helloServiceImp = (HelloServiceImp) serviceClass.newInstance();
-        Object object = fastMethod.invoke(helloServiceImp, new Object[]{"ll"});
+        final HelloServiceImp helloServiceImp = (HelloServiceImp) serviceClass.newInstance();
+
+        // cglib 动态代理测试
+//        FastClass fastClass =FastClass.create(serviceClass);
+//        FastMethod fastMethod = fastClass.getMethod("hello", new Class[]{String.class});
+//        final Object object = fastMethod.invoke(helloServiceImp, new Object[]{"ll"});
+
+        // JDK 动态代理
+//        Class[] classes = serviceClass.getInterfaces();
+//        HelloService helloService = (HelloService)Proxy.newProxyInstance(serviceClass.getClassLoader(), serviceClass.getInterfaces(),
+//                new InvocationHandler() {
+//                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+//                        System.out.println("执行方法前。。。");
+//                        Object obj = method.invoke(helloServiceImp, args);
+//                        System.out.println("执行方法后。。。");
+//                        return obj;
+//                    }
+//                });
+//        String s = helloService.hello("思佳");
+//        System.out.println(s);
+
+        return;
+    }
+
+    static void fun(Object object){
+        System.out.println(object.getClass());
+        System.out.println(object instanceof String);
         return;
     }
 }

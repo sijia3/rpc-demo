@@ -52,10 +52,10 @@ public class RpcClient extends SimpleChannelInboundHandler<Response> {
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
-//                    ch.pipeline().addLast(new RpcEncoder(Request.class));
-//                    ch.pipeline().addLast(new RpcDecoder(Response.class));
-                    ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingDecoder());
-                    ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingEncoder());
+                    ch.pipeline().addLast(new RpcEncoder(Request.class));
+                    ch.pipeline().addLast(new RpcDecoder(Response.class));
+//                    ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingDecoder());
+//                    ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingEncoder());
                     ch.pipeline().addLast(RpcClient.this);
                 }
             });
