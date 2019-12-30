@@ -23,7 +23,6 @@ public class RpcEncoder extends MessageToByteEncoder {
             byte[] bytes = SerializationUtil.serialize(in);
             byteBuf.writeInt(bytes.length);
             byteBuf.writeBytes(bytes);
-            System.out.println("编码成功");
         }
 
     }

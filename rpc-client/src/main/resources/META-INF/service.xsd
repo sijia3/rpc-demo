@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsdd:schema xmlns="http://www.sijia3.com/schema/sijia3"
+        xmlns:xsdd="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://www.sijia3.com/schema/sijia3">
+    <xsdd:element name="service">
+        <xsdd:complexType>
+            <xsdd:attribute name="id" type="xsdd:ID"/>
+            <xsdd:attribute name="version" type="xsdd:string" />
+            <xsdd:attribute name="class" type="xsdd:string" use="required"/>
+        </xsdd:complexType>
+    </xsdd:element>
+
+
+</xsdd:schema>

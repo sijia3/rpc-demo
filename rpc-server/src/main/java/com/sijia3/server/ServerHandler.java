@@ -10,6 +10,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import net.sf.cglib.reflect.FastClass;
 import net.sf.cglib.reflect.FastMethod;
+import org.objenesis.Objenesis;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<Request> {
         if(StringUtil.isNotEmpty(version)){
             className = className + "-"+version;
         }
-//        Object object = "lalalal";
         Object serviceBean = handleMap.get(className);
         if (serviceBean == null){
             throw new RuntimeException("servicebean not find");
@@ -52,10 +52,15 @@ public class ServerHandler extends SimpleChannelInboundHandler<Request> {
         String methodName = request.getMethodName();
         Class<?>[] parameterTypes = request.getPrameterTypes();
         Object[] parameters = request.getParameters();
-        // 执行方法
-        FastClass fastClass =FastClass.create(serviceClass);
-        FastMethod fastMethod = fastClass.getMethod(methodName, parameterTypes);
-        Object object = fastMethod.invoke(serviceBean, parameters);
+
+        // 采用fastclass执行方法
+//        FastClass fastClass =FastClass.create(serviceClass);
+//        FastMethod fastMethod = fastClass.getMethod(methodName, parameterTypes);
+//        Object object = fastMethod.invoke(serviceBean, parameters);
+
+        // 采用jdk执行方法
+        Method method = serviceClass.getMethod(methodName, parameterTypes);
+        Object object = method.invoke(serviceClass.newInstance(), parameters);
 
         // 构造repsonse
         Response response = new Response();
@@ -65,6 +70,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Request> {
         channelHandlerContext.writeAndFlush(response).addListeners(ChannelFutureListener.CLOSE);
 //        channelHandlerContext.writeAndFlush(response);
     }
+
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
@@ -95,12 +101,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<Request> {
 //        String s = helloService.hello("思佳");
 //        System.out.println(s);
 
+        String s = fun("ddd");
+        Integer i = fun(1);
         return;
     }
 
-    static void fun(Object object){
+    static <T> T fun(T object){
         System.out.println(object.getClass());
         System.out.println(object instanceof String);
-        return;
+        return object;
     }
 }

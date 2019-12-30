@@ -18,7 +18,6 @@ public class ServerDiscoveryImpl implements ServerDiscovery {
 
     public String findServerByName(String serverName) {
         ZkClient zkClient = new ZkClient("127.0.0.1:2181",5000, 1000);
-        System.out.println("连接zookeeper");
         try {
             String serverPath = "/registry"+"/"+serverName;
             if (!zkClient.exists(serverPath)){

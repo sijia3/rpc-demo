@@ -43,17 +43,17 @@ public class SerializationUtil {
         }
     }
 
-
+    @SuppressWarnings("unchecked")
     public static <T> byte[] seri(T request){
-        Class cls = request.getClass();
+        Class<T> cls = (Class<T>)request.getClass();
         LinkedBuffer buffer = LinkedBuffer.allocate(512);
-        Schema schema = RuntimeSchema.getSchema(cls);
+        Schema<T> schema = RuntimeSchema.getSchema(cls);
         return ProtostuffIOUtil.toByteArray(request, schema, buffer);
     }
 
     public static <T> T deseri(byte[] bytes,Class<T> clazz){
         T obj = objenesis.newInstance(clazz);
-        Schema schema = RuntimeSchema.getSchema(clazz);
+        Schema<T> schema = RuntimeSchema.getSchema(clazz);
         ProtostuffIOUtil.mergeFrom(bytes, obj, schema);
         return obj;
     }

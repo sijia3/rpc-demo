@@ -66,9 +66,9 @@ public class RpcClient extends SimpleChannelInboundHandler<Response> {
 //                Thread.sleep(1000);
 //            }
             f.channel().writeAndFlush(request).sync();
-            logger.info("写入成功");
+//            logger.info("写入成功");
             f.channel().closeFuture().sync();
-            logger.info("关闭成功");
+//            logger.info("关闭成功");
             return response;
         } finally {
             workerGroup.shutdownGracefully();

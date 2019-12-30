@@ -21,7 +21,6 @@ public class RpcDecoder extends ByteToMessageDecoder {
     }
 
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        System.out.println("开始解码");
         if (in.readableBytes() < 4){      // 可读字节不够长度
             return;
         }
